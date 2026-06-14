@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:9000",
+  baseURL: "https://real-time-chat-application-1-pcb8.onrender.com/",
 });
 
 API.interceptors.request.use((config) => {

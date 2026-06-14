@@ -11,7 +11,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      const newSocket = io("http://localhost:9000", {
+      const newSocket = io("https://real-time-chat-application-1-pcb8.onrender.com", {
         query: { userId: user.id },
       });
 
