@@ -23,9 +23,9 @@ io.on("connection", async (socket) => {
   const userId = socket.handshake.query.userId;
 
   if (userId) {
-    await redis.set(`online:${userId}`, "true");
-    await redis.set(`socket:${userId}`, socket.id);
-  }
+  await redis.set(`online:${userId}`, "true", "EX", 3600);
+  await redis.set(`socket:${userId}`, socket.id, "EX", 3600);
+}
 
   // emit online users to everyone
   const keys = await redis.keys("online:*");
