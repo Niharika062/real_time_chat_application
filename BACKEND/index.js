@@ -17,22 +17,31 @@ const io = new Server(httpServer, {
   },
 });
 
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
   console.log("User connected:", socket.id);
 
   const userId = socket.handshake.query.userId;
 
   if (userId) {
-    redis.set(`online:${userId}`, "true");
-    redis.set(`socket:${userId}`, socket.id);
+    await redis.set(`online:${userId}`, "true");
+    await redis.set(`socket:${userId}`, socket.id);
   }
 
-  socket.on("disconnect", () => {
+  // emit online users to everyone
+  const keys = await redis.keys("online:*");
+  const onlineUserIds = keys.map((key) => key.replace("online:", ""));
+  io.emit("getOnlineUsers", onlineUserIds);
+
+  socket.on("disconnect", async () => {
     console.log("User disconnected:", socket.id);
     if (userId) {
-      redis.del(`online:${userId}`);
-      redis.del(`socket:${userId}`);
+      await redis.del(`online:${userId}`);
+      await redis.del(`socket:${userId}`);
     }
+    // emit updated online users
+    const keys = await redis.keys("online:*");
+    const onlineUserIds = keys.map((key) => key.replace("online:", ""));
+    io.emit("getOnlineUsers", onlineUserIds);
   });
 });
 
